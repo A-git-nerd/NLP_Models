@@ -1,0 +1,6 @@
+,input_dim,hidden_dim,num_layers,dropout,batch_size,learning_rate,num_epochs,optimizer,embedding_dim,w2v_window,w2v_min_count,glove_learning_rate,x_max,alpha,ft_window,ft_min_count
+LSTM (without embeddings),1000,256,2,0.3,32,0.001,10,Adam,,,,,,,,
+LSTM with Word2Vec,,256,2,0.3,32,0.001,10,Adam,128,5,1,,,,,
+LSTM with Glove,,256,2,0.3,32,0.001,10,Adam,128,,,0.05,100,0.75,,
+LSTM with Fasttext,,256,2,0.3,32,0.001,10,Adam,128,,,,,,5,1
+LSTM with Elmo,,256,2,0.3,32,0.001,10,Adam,1024,,,,,,,
