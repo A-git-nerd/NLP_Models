@@ -1,0 +1,5 @@
+,embedding_dim,hidden_dim,num_layers,dropout,learning_rate,num_epochs,clip,optimizer,nhead,dim_feedforward
+RNN Seq2Seq,256,512,2,0.3,0.001,50,1,Adam,,
+BiRNN Seq2Seq,256,512,2,0.3,0.001,50,1,Adam,,
+LSTM Seq2Seq,256,512,2,0.3,0.001,50,1,Adam,,
+Transformer,256,512,3,0.3,0.0001,50,1,Adam,8,512
