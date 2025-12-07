@@ -1,0 +1,45 @@
+Example 1:
+Source (English): return next week
+Reference (Urdu): اگلے ہفتے واپس آؤ
+Translations:
+  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
+  BiRNN Seq2Seq: وہ ایک گاڑی ہے
+  LSTM Seq2Seq: وہ ایک ڈاکٹر ہے
+  Transformer: وہ گاڑی چلا سکتا ہے
+
+Example 2:
+Source (English): i eat rice
+Reference (Urdu): میں چاول کھاتا ہوں
+Translations:
+  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
+  BiRNN Seq2Seq: وہ ایک ہے
+  LSTM Seq2Seq: میں کام کر رہا ہوں
+  Transformer: میں ایک طالب علم ہوں
+
+Example 3:
+Source (English): he drinks milk
+Reference (Urdu): وہ دودھ پیتا ہے
+Translations:
+  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
+  BiRNN Seq2Seq: وہ ایک گاڑی ہے
+  LSTM Seq2Seq: وہ ایک ڈاکٹر ہے
+  Transformer: وہ گاڑی چلا سکتا ہے
+
+Example 4:
+Source (English): she cooks food
+Reference (Urdu): وہ کھانا پکاتی ہے
+Translations:
+  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
+  BiRNN Seq2Seq: وہ ایک گاڑی ہے
+  LSTM Seq2Seq: وہ ایک ڈاکٹر ہے
+  Transformer: وہ گا سکتی ہے
+
+Example 5:
+Source (English): we play cricket
+Reference (Urdu): ہم کرکٹ کھیلتے ہیں
+Translations:
+  RNN Seq2Seq: بہت ٹھنڈا ہے
+  BiRNN Seq2Seq: وہ ایک گاڑی ہے
+  LSTM Seq2Seq: کھانا لذیذ ہے
+  Transformer: ہم ناچ سکتے ہیں
+

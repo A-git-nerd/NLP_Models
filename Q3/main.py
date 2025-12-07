@@ -160,25 +160,25 @@ def main():
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
     
     rnn_hyperparams = {
-        'embedding_dim': 256,
-        'hidden_dim': 512,
-        'num_layers': 2,
-        'dropout': 0.3,
-        'learning_rate': 0.001,
-        'num_epochs': 50,
+        'embedding_dim': 128,
+        'hidden_dim': 256,
+        'num_layers': 1,
+        'dropout': 0.1,
+        'learning_rate': 0.01,
+        'num_epochs': 500,
         'clip': 1,
         'optimizer': 'Adam'
     }
     
     transformer_hyperparams = {
-        'embedding_dim': 256,
-        'hidden_dim': 512,
-        'num_layers': 3,
-        'nhead': 8,
-        'dim_feedforward': 512,
-        'dropout': 0.3,
-        'learning_rate': 0.0001,
-        'num_epochs': 50,
+        'embedding_dim': 128,
+        'hidden_dim': 256,
+        'num_layers': 2,
+        'nhead': 4,
+        'dim_feedforward': 256,
+        'dropout': 0.1,
+        'learning_rate': 0.001,
+        'num_epochs': 500,
         'clip': 1,
         'optimizer': 'Adam'
     }
