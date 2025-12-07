@@ -3,6 +3,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from transformers import BertTokenizer, XLMRobertaTokenizer
 import pandas as pd
+import numpy as np
+from sklearn.utils.class_weight import compute_class_weight
 import sys
 import os
 
@@ -18,7 +20,7 @@ from models.xlm_roberta_model import XLMRobertaModel_Custom
 from training.trainer import train_model
 from evaluation.metrics import evaluate_model
 
-def train_sequence_model(model_class, model_name, train_dataset, test_dataset, hyperparams, device):
+def train_sequence_model(model_class, model_name, train_dataset, test_dataset, hyperparams, device, class_weights=None):
     print(f"\n{'='*50}")
     print(f"Training {model_name}")
     print(f"{'='*50}")
@@ -35,7 +37,11 @@ def train_sequence_model(model_class, model_name, train_dataset, test_dataset, h
         dropout=hyperparams['dropout']
     ).to(device)
     
-    criterion = nn.CrossEntropyLoss()
+    # Use class weights if provided
+    if class_weights is not None:
+        criterion = nn.CrossEntropyLoss(weight=class_weights)
+    else:
+        criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams['learning_rate'])
     
     model = train_model(model, train_loader, test_loader, criterion, optimizer, device, 
@@ -47,7 +53,7 @@ def train_sequence_model(model_class, model_name, train_dataset, test_dataset, h
 
 def train_transformer_model(model_class, model_name, tokenizer_class, tokenizer_name, 
                            train_texts, train_labels, test_texts, test_labels, 
-                           hyperparams, device):
+                           hyperparams, device, class_weights=None):
     print(f"\n{'='*50}")
     print(f"Training {model_name}")
     print(f"{'='*50}")
@@ -62,7 +68,11 @@ def train_transformer_model(model_class, model_name, tokenizer_class, tokenizer_
     
     model = model_class(dropout=hyperparams['dropout']).to(device)
     
-    criterion = nn.CrossEntropyLoss()
+    # Use class weights if provided
+    if class_weights is not None:
+        criterion = nn.CrossEntropyLoss(weight=class_weights)
+    else:
+        criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=hyperparams['learning_rate'])
     
     model = train_model(model, train_loader, test_loader, criterion, optimizer, device, 
@@ -82,6 +92,17 @@ def main():
     print(f"Train samples: {len(train_texts)}")
     print(f"Test samples: {len(test_texts)}")
     
+    # Print class distribution
+    unique, counts = np.unique(train_labels, return_counts=True)
+    print(f"\nClass distribution in training data:")
+    for cls, cnt in zip(unique, counts):
+        print(f"  Class {cls}: {cnt} ({cnt/len(train_labels)*100:.1f}%)")
+    
+    # Calculate class weights for handling imbalanced data
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_labels), y=train_labels)
+    class_weights = torch.FloatTensor(class_weights).to(device)
+    print(f"\nClass weights: {class_weights}")
+    
     train_dataset = UrduSentimentDataset(train_texts, train_labels, vocab=None, max_len=100)
     test_dataset = UrduSentimentDataset(test_texts, test_labels, vocab=train_dataset.vocab, max_len=100)
     
@@ -94,8 +115,8 @@ def main():
         'num_layers': 2,
         'dropout': 0.3,
         'batch_size': 32,
-        'learning_rate': 0.001,
-        'num_epochs': 10
+        'learning_rate': 0.005,  # Increased from 0.001
+        'num_epochs': 20  # Increased from 10
     }
     
     models_to_train = [
@@ -107,7 +128,7 @@ def main():
     
     for model_class, model_name in models_to_train:
         results, params = train_sequence_model(model_class, model_name, train_dataset, 
-                                              test_dataset, sequence_hyperparams, device)
+                                              test_dataset, sequence_hyperparams, device, class_weights)
         results_dict[model_name] = results
         hyperparams_dict[model_name] = params
     
@@ -122,7 +143,7 @@ def main():
     results, params = train_transformer_model(
         MBERTModel, 'mBERT', BertTokenizer, 'bert-base-multilingual-cased',
         train_texts, train_labels, test_texts, test_labels, 
-        transformer_hyperparams, device
+        transformer_hyperparams, device, class_weights
     )
     results_dict['mBERT'] = results
     hyperparams_dict['mBERT'] = params
@@ -130,7 +151,7 @@ def main():
     results, params = train_transformer_model(
         XLMRobertaModel_Custom, 'XLM-RoBERTa', XLMRobertaTokenizer, 'xlm-roberta-base',
         train_texts, train_labels, test_texts, test_labels, 
-        transformer_hyperparams, device
+        transformer_hyperparams, device, class_weights
     )
     results_dict['XLM-RoBERTa'] = results
     hyperparams_dict['XLM-RoBERTa'] = params
