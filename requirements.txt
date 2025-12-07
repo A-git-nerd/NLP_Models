@@ -8,3 +8,5 @@ gensim
 nltk
 sentencepiece
 sacrebleu
+matplotlib
+protobuf

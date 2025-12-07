@@ -12,6 +12,7 @@ from models.rnn_seq2seq import RNNEncoder, RNNDecoder, RNNSeq2Seq
 from models.birnn_seq2seq import BiRNNEncoder, BiRNNDecoder, BiRNNSeq2Seq
 from models.lstm_seq2seq import LSTMEncoder, LSTMDecoder, LSTMSeq2Seq
 from models.transformer_seq2seq import TransformerSeq2Seq
+from models.mbart_seq2seq import MBARTSeq2Seq
 from training.trainer import train_model
 from evaluation.metrics import calculate_bleu, translate_sentence
 
@@ -138,6 +139,18 @@ def train_transformer_model(train_loader, val_loader, src_vocab_size, tgt_vocab_
     
     return model
 
+def use_mbart_model(test_en, test_ur, device):
+    print("\n" + "="*80)
+    print("Using Pre-trained mBART-50 Model (Zero-shot)")
+    print("="*80)
+    
+    model = MBARTSeq2Seq(device=device)
+    model.to(device)
+    
+    print("Performing zero-shot translation with pre-trained mBART...")
+    
+    return model
+
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
@@ -165,7 +178,7 @@ def main():
         'num_layers': 1,
         'dropout': 0.1,
         'learning_rate': 0.01,
-        'num_epochs': 500,
+        'num_epochs': 50,
         'clip': 1,
         'optimizer': 'Adam'
     }
@@ -178,7 +191,7 @@ def main():
         'dim_feedforward': 256,
         'dropout': 0.1,
         'learning_rate': 0.001,
-        'num_epochs': 500,
+        'num_epochs': 50,
         'clip': 1,
         'optimizer': 'Adam'
     }
@@ -202,6 +215,11 @@ def main():
     models['Transformer'] = transformer_model
     hyperparams_dict['Transformer'] = transformer_hyperparams
     
+    # Add pre-trained mBART (zero-shot)
+    mbart_model = use_mbart_model(test_en, test_ur, device)
+    models['mBART-50 (zero-shot)'] = mbart_model
+    hyperparams_dict['mBART-50 (zero-shot)'] = {'model': 'facebook/mbart-large-50', 'fine_tuning': 'none'}
+    
     print("\n" + "="*80)
     print("EVALUATION - BLEU SCORES")
     print("="*80)
@@ -210,13 +228,32 @@ def main():
     test_data = list(zip(test_en, test_ur))
     
     for model_name, model in models.items():
-        is_transformer = (model_name == 'Transformer')
-        bleu_score, hypotheses, references = calculate_bleu(model, test_data, src_vocab, tgt_vocab, device, is_transformer)
-        results[model_name] = {
-            'BLEU Score': bleu_score,
-            'Hypotheses': hypotheses,
-            'References': references
-        }
+        if model_name == 'mBART-50 (zero-shot)':
+            # Special handling for mBART
+            hypotheses = []
+            references = []
+            for src_text, tgt_text in test_data:
+                translation = model.translate(src_text)
+                hypotheses.append(translation)
+                references.append([tgt_text])
+            
+            from sacrebleu import corpus_bleu
+            bleu = corpus_bleu(hypotheses, references)
+            bleu_score = bleu.score
+            
+            results[model_name] = {
+                'BLEU Score': bleu_score,
+                'Hypotheses': hypotheses,
+                'References': references
+            }
+        else:
+            is_transformer = (model_name == 'Transformer')
+            bleu_score, hypotheses, references = calculate_bleu(model, test_data, src_vocab, tgt_vocab, device, is_transformer)
+            results[model_name] = {
+                'BLEU Score': bleu_score,
+                'Hypotheses': hypotheses,
+                'References': references
+            }
         print(f"{model_name}: BLEU = {bleu_score:.2f}")
     
     print("\n" + "="*80)

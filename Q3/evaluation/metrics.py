@@ -4,6 +4,10 @@ from sacrebleu import corpus_bleu
 def translate_sentence(model, sentence, src_vocab, tgt_vocab, device, max_len=50, is_transformer=False):
     model.eval()
     
+    # Check if this is mBART model (has translate method)
+    if hasattr(model, 'translate'):
+        return model.translate(sentence)
+    
     idx_to_tgt = {idx: word for word, idx in tgt_vocab.items()}
     
     tokens = sentence.lower().split()

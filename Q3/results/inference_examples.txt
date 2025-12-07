@@ -2,44 +2,49 @@ Example 1:
 Source (English): return next week
 Reference (Urdu): اگلے ہفتے واپس آؤ
 Translations:
-  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
+  RNN Seq2Seq: وہ ایک ہے
   BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: وہ ایک ڈاکٹر ہے
-  Transformer: وہ گاڑی چلا سکتا ہے
+  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
+  Transformer: میں تیر سکتا ہوں
+  mBART-50 (zero-shot): واپس اگلے ہفتے
 
 Example 2:
 Source (English): i eat rice
 Reference (Urdu): میں چاول کھاتا ہوں
 Translations:
-  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
-  BiRNN Seq2Seq: وہ ایک ہے
-  LSTM Seq2Seq: میں کام کر رہا ہوں
-  Transformer: میں ایک طالب علم ہوں
+  RNN Seq2Seq: وہ ایک گاڑی ہے
+  BiRNN Seq2Seq: وہ ایک گاڑی ہے
+  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
+  Transformer: میں ٹھیک ہوں
+  mBART-50 (zero-shot): میں روٹی کھاتا ہوں.
 
 Example 3:
 Source (English): he drinks milk
 Reference (Urdu): وہ دودھ پیتا ہے
 Translations:
-  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
+  RNN Seq2Seq: وہ ایک ہے
   BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: وہ ایک ڈاکٹر ہے
-  Transformer: وہ گاڑی چلا سکتا ہے
+  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
+  Transformer: وہ کل گیا تھا
+  mBART-50 (zero-shot): وہ دودھ پیتا ہے
 
 Example 4:
 Source (English): she cooks food
 Reference (Urdu): وہ کھانا پکاتی ہے
 Translations:
-  RNN Seq2Seq: وہ ایک ڈاکٹر ہے
+  RNN Seq2Seq: وہ ایک گاڑی ہے
   BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: وہ ایک ڈاکٹر ہے
-  Transformer: وہ گا سکتی ہے
+  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
+  Transformer: وہ کل گیا تھا
+  mBART-50 (zero-shot): وہ کھانا پکتا ہے
 
 Example 5:
 Source (English): we play cricket
 Reference (Urdu): ہم کرکٹ کھیلتے ہیں
 Translations:
-  RNN Seq2Seq: بہت ٹھنڈا ہے
+  RNN Seq2Seq: وہ ایک گاڑی ہے
   BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: کھانا لذیذ ہے
+  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
   Transformer: ہم ناچ سکتے ہیں
+  mBART-50 (zero-shot): ہم کرکیٹ کھیلتے ہیں
 

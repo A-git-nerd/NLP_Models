@@ -1,5 +1,6 @@
-,embedding_dim,hidden_dim,num_layers,dropout,learning_rate,num_epochs,clip,optimizer,nhead,dim_feedforward
-RNN Seq2Seq,128,256,1,0.1,0.01,500,1,Adam,,
-BiRNN Seq2Seq,128,256,1,0.1,0.01,500,1,Adam,,
-LSTM Seq2Seq,128,256,1,0.1,0.01,500,1,Adam,,
-Transformer,128,256,2,0.1,0.001,500,1,Adam,4,256
+,embedding_dim,hidden_dim,num_layers,dropout,learning_rate,num_epochs,clip,optimizer,nhead,dim_feedforward,model,fine_tuning
+RNN Seq2Seq,128,256,1,0.1,0.01,50,1,Adam,,,,
+BiRNN Seq2Seq,128,256,1,0.1,0.01,50,1,Adam,,,,
+LSTM Seq2Seq,128,256,1,0.1,0.01,50,1,Adam,,,,
+Transformer,128,256,2,0.1,0.001,50,1,Adam,4,256,,
+mBART-50 (zero-shot),,,,,,,,,,,facebook/mbart-large-50,none
