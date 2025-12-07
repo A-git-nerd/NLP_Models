@@ -1,0 +1,9 @@
+torch
+transformers
+scikit-learn
+pandas
+requests
+tqdm
+gensim
+nltk
+sentencepiece
