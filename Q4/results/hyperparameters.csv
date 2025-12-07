@@ -1,0 +1,2 @@
+embedding_dim,hidden_dim,num_layers,dropout,learning_rate,num_epochs,clip,optimizer
+100,128,1,0.0,0.001,200,1,Adam

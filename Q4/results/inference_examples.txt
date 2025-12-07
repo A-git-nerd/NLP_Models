@@ -1,0 +1,30 @@
+Example 1:
+Source (English): return next week
+Reference (Urdu): اگلے ہفتے واپس آؤ
+Random Embeddings: وہ ایک ڈاکٹر ہے
+GloVe Embeddings: وہ ایک استاد ہے
+
+Example 2:
+Source (English): i eat rice
+Reference (Urdu): میں چاول کھاتا ہوں
+Random Embeddings: وہ ایک ڈاکٹر ہے
+GloVe Embeddings: وہ ایک استاد ہے
+
+Example 3:
+Source (English): he drinks milk
+Reference (Urdu): وہ دودھ پیتا ہے
+Random Embeddings: وہ ایک ڈاکٹر ہے
+GloVe Embeddings: وہ ایک استاد ہے
+
+Example 4:
+Source (English): she cooks food
+Reference (Urdu): وہ کھانا پکاتی ہے
+Random Embeddings: وہ ایک ڈاکٹر ہے
+GloVe Embeddings: وہ ایک استاد ہے
+
+Example 5:
+Source (English): we play cricket
+Reference (Urdu): ہم کرکٹ کھیلتے ہیں
+Random Embeddings: وہ ایک ڈاکٹر ہے
+GloVe Embeddings: وہ ایک استاد ہے
+
