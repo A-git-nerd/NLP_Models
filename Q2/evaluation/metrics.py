@@ -17,9 +17,9 @@ def evaluate_model(model, dataloader, device):
             all_labels.extend(labels.cpu().numpy())
     
     accuracy = accuracy_score(all_labels, all_preds)
-    precision = precision_score(all_labels, all_preds, average='binary')
-    recall = recall_score(all_labels, all_preds, average='binary')
-    f1 = f1_score(all_labels, all_preds, average='binary')
+    precision = precision_score(all_labels, all_preds, average='binary', zero_division=0)
+    recall = recall_score(all_labels, all_preds, average='binary', zero_division=0)
+    f1 = f1_score(all_labels, all_preds, average='binary', zero_division=0)
     
     return {
         'accuracy': accuracy,

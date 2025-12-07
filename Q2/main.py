@@ -19,6 +19,7 @@ from models.lstm_elmo import LSTMWithELMo
 from utils.dataset import EmbeddingDataset, ELMoDataset
 from training.trainer import train_model
 from evaluation.metrics import evaluate_model
+from sklearn.utils.class_weight import compute_class_weight
 
 def train_lstm_without_embedding(train_texts, train_labels, test_texts, test_labels, device):
     print("\n" + "="*80)
@@ -42,12 +43,16 @@ def train_lstm_without_embedding(train_texts, train_labels, test_texts, test_lab
     test_loader = DataLoader([(torch.FloatTensor(x), torch.LongTensor([y])[0]) for x, y in test_dataset], 
                              batch_size=32, shuffle=False)
     
+    # Calculating class weights
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_labels), y=train_labels)
+    class_weights = torch.FloatTensor(class_weights).to(device)
+    
     model = LSTMWithoutEmbedding(input_dim=1000, hidden_dim=256, num_layers=2, dropout=0.3).to(device)
     
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     
-    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=10)
+    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=20)
     
     results = evaluate_model(model, test_loader, device)
     
@@ -58,7 +63,7 @@ def train_lstm_without_embedding(train_texts, train_labels, test_texts, test_lab
         'dropout': 0.3,
         'batch_size': 32,
         'learning_rate': 0.001,
-        'num_epochs': 10,
+        'num_epochs': 20,
         'optimizer': 'Adam'
     }
     
@@ -69,7 +74,7 @@ def train_lstm_with_word2vec(train_texts, train_labels, test_texts, test_labels,
     print("Training LSTM with Word2Vec embeddings")
     print("="*80)
     
-    w2v = Word2VecEmbedding(vector_size=128, window=5, min_count=1, epochs=10)
+    w2v = Word2VecEmbedding(vector_size=128, window=5, min_count=1, epochs=20)
     w2v.train(train_texts)
     
     embedding_matrix, word_to_idx = w2v.get_embedding_matrix()
@@ -80,12 +85,15 @@ def train_lstm_with_word2vec(train_texts, train_labels, test_texts, test_labels,
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_labels), y=train_labels)
+    class_weights = torch.FloatTensor(class_weights).to(device)
+    
     model = LSTMWithPretrainedEmbedding(embedding_matrix, hidden_dim=256, num_layers=2, dropout=0.3).to(device)
     
-    criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
     
-    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=10)
+    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=20)
     
     results = evaluate_model(model, test_loader, device)
     
@@ -95,8 +103,8 @@ def train_lstm_with_word2vec(train_texts, train_labels, test_texts, test_labels,
         'num_layers': 2,
         'dropout': 0.3,
         'batch_size': 32,
-        'learning_rate': 0.001,
-        'num_epochs': 10,
+        'learning_rate': 0.005,
+        'num_epochs': 20,
         'optimizer': 'Adam',
         'w2v_window': 5,
         'w2v_min_count': 1
@@ -109,7 +117,7 @@ def train_lstm_with_glove(train_texts, train_labels, test_texts, test_labels, de
     print("Training LSTM with GloVe embeddings")
     print("="*80)
     
-    glove = GloveEmbedding(vector_size=128, learning_rate=0.05, epochs=10)
+    glove = GloveEmbedding(vector_size=128, learning_rate=0.05, epochs=20)
     glove.train(train_texts)
     
     embedding_matrix, word_to_idx = glove.get_embedding_matrix()
@@ -120,12 +128,16 @@ def train_lstm_with_glove(train_texts, train_labels, test_texts, test_labels, de
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     
+    # Calculate class weights
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_labels), y=train_labels)
+    class_weights = torch.FloatTensor(class_weights).to(device)
+    
     model = LSTMWithPretrainedEmbedding(embedding_matrix, hidden_dim=256, num_layers=2, dropout=0.3).to(device)
     
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     
-    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=10)
+    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=20)
     
     results = evaluate_model(model, test_loader, device)
     
@@ -136,7 +148,7 @@ def train_lstm_with_glove(train_texts, train_labels, test_texts, test_labels, de
         'dropout': 0.3,
         'batch_size': 32,
         'learning_rate': 0.001,
-        'num_epochs': 10,
+        'num_epochs': 20,
         'optimizer': 'Adam',
         'glove_learning_rate': 0.05,
         'x_max': 100,
@@ -150,7 +162,7 @@ def train_lstm_with_fasttext(train_texts, train_labels, test_texts, test_labels,
     print("Training LSTM with FastText embeddings")
     print("="*80)
     
-    ft = FastTextEmbedding(vector_size=128, window=5, min_count=1, epochs=10)
+    ft = FastTextEmbedding(vector_size=128, window=5, min_count=1, epochs=30)
     ft.train(train_texts)
     
     embedding_matrix, word_to_idx = ft.get_embedding_matrix()
@@ -161,12 +173,16 @@ def train_lstm_with_fasttext(train_texts, train_labels, test_texts, test_labels,
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     
-    model = LSTMWithPretrainedEmbedding(embedding_matrix, hidden_dim=256, num_layers=2, dropout=0.3).to(device)
+    # Calculate class weights
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_labels), y=train_labels)
+    class_weights = torch.FloatTensor(class_weights).to(device)
     
-    criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    model = LSTMWithPretrainedEmbedding(embedding_matrix, hidden_dim=256, num_layers=2, dropout=0.3, freeze_embedding=False).to(device)
     
-    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=10)
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    
+    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=30)
     
     results = evaluate_model(model, test_loader, device)
     
@@ -176,11 +192,12 @@ def train_lstm_with_fasttext(train_texts, train_labels, test_texts, test_labels,
         'num_layers': 2,
         'dropout': 0.3,
         'batch_size': 32,
-        'learning_rate': 0.001,
-        'num_epochs': 10,
+        'learning_rate': 0.01,
+        'num_epochs': 30,
         'optimizer': 'Adam',
         'ft_window': 5,
-        'ft_min_count': 1
+        'ft_min_count': 1,
+        'ft_embedding_epochs': 30
     }
     
     return results, hyperparams
@@ -204,12 +221,16 @@ def train_lstm_with_elmo(train_texts, train_labels, test_texts, test_labels, dev
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     
+    # Calculate class weights
+    class_weights = compute_class_weight('balanced', classes=np.unique(train_labels), y=train_labels)
+    class_weights = torch.FloatTensor(class_weights).to(device)
+    
     model = LSTMWithELMo(input_dim=elmo.get_embedding_dim(), hidden_dim=256, num_layers=2, dropout=0.3).to(device)
     
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     
-    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=10)
+    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, num_epochs=20)
     
     results = evaluate_model(model, test_loader, device)
     
@@ -220,7 +241,7 @@ def train_lstm_with_elmo(train_texts, train_labels, test_texts, test_labels, dev
         'dropout': 0.3,
         'batch_size': 32,
         'learning_rate': 0.001,
-        'num_epochs': 10,
+        'num_epochs': 20,
         'optimizer': 'Adam'
     }
     
@@ -235,6 +256,12 @@ def main():
     
     print(f"Train samples: {len(train_texts)}")
     print(f"Test samples: {len(test_texts)}")
+    
+    # Print class distribution
+    unique, counts = np.unique(train_labels, return_counts=True)
+    print(f"\nClass distribution in training data:")
+    for cls, cnt in zip(unique, counts):
+        print(f"  Class {cls}: {cnt} ({cnt/len(train_labels)*100:.1f}%)")
     
     results_dict = {}
     hyperparams_dict = {}

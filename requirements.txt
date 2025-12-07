@@ -7,3 +7,4 @@ tqdm
 gensim
 nltk
 sentencepiece
+sacrebleu
