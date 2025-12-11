@@ -52,21 +52,28 @@ class GloveEmbedding:
             for (i, j), x_ij in cooccurrence.items():
                 weight = min(1.0, (x_ij / self.x_max) ** self.alpha) if x_ij < self.x_max else 1.0
                 
-                diff = np.dot(W[i], W_tilde[j]) + b[i] + b_tilde[j] - np.log(x_ij)
+                diff = np.dot(W[i], W_tilde[j]) + b[i] + b_tilde[j] - np.log(x_ij + 1e-10)
                 loss = weight * diff * diff
                 total_loss += loss
                 
-                grad = weight * diff
+                grad = 2 * weight * diff
                 
-                W[i] -= self.learning_rate * grad * W_tilde[j]
-                W_tilde[j] -= self.learning_rate * grad * W[i]
+                # Update with proper gradient
+                W_grad = grad * W_tilde[j]
+                W_tilde_grad = grad * W[i]
+                
+                W[i] -= self.learning_rate * W_grad
+                W_tilde[j] -= self.learning_rate * W_tilde_grad
                 b[i] -= self.learning_rate * grad
                 b_tilde[j] -= self.learning_rate * grad
             
-            if (epoch + 1) % 2 == 0:
-                print(f"Epoch {epoch + 1}/{self.epochs}, Loss: {total_loss:.4f}")
+            if (epoch + 1) % 5 == 0:
+                print(f"GloVe Epoch {epoch + 1}/{self.epochs}, Loss: {total_loss:.4f}")
         
-        self.word_vectors = W + W_tilde
+        # Average the two context representations (don't normalize - causes issues)
+        self.word_vectors = (W + W_tilde) / 2.0
+        
+        print(f"Final embedding stats - Mean: {self.word_vectors.mean():.4f}, Std: {self.word_vectors.std():.4f}")
         
         return self.word_vectors
     
