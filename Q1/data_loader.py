@@ -87,7 +87,7 @@ def load_and_process_data(file_path):
     df.columns = df.columns.str.strip()
     
     # Map classes to 0 and 1
-    # Assuming 'Class' column with 'P' and 'N'
+    # 'Class' column with 'P' and 'N'
     label_map = {'P': 1, 'N': 0}
     df['label'] = df['Class'].map(label_map)
     

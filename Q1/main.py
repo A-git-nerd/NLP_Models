@@ -19,6 +19,7 @@ from models.mbert_model import MBERTModel
 from models.xlm_roberta_model import XLMRobertaModel_Custom
 from training.trainer import train_model
 from evaluation.metrics import evaluate_model
+from utils.plotting import plot_training_history
 
 def train_sequence_model(model_class, model_name, train_dataset, test_dataset, hyperparams, device, class_weights=None):
     print(f"\n{'='*50}")
@@ -44,12 +45,12 @@ def train_sequence_model(model_class, model_name, train_dataset, test_dataset, h
         criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams['learning_rate'])
     
-    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, 
+    model, history = train_model(model, train_loader, test_loader, criterion, optimizer, device, 
                        hyperparams['num_epochs'], is_transformer=False)
     
     results = evaluate_model(model, test_loader, device, is_transformer=False)
     
-    return results, hyperparams
+    return results, hyperparams, history
 
 def train_transformer_model(model_class, model_name, tokenizer_class, tokenizer_name, 
                            train_texts, train_labels, test_texts, test_labels, 
@@ -75,12 +76,12 @@ def train_transformer_model(model_class, model_name, tokenizer_class, tokenizer_
         criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=hyperparams['learning_rate'])
     
-    model = train_model(model, train_loader, test_loader, criterion, optimizer, device, 
+    model, history = train_model(model, train_loader, test_loader, criterion, optimizer, device, 
                        hyperparams['num_epochs'], is_transformer=True)
     
     results = evaluate_model(model, test_loader, device, is_transformer=True)
     
-    return results, hyperparams
+    return results, hyperparams, history
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -108,6 +109,7 @@ def main():
     
     results_dict = {}
     hyperparams_dict = {}
+    histories = {}
     
     sequence_hyperparams = {
         'embedding_dim': 128,
@@ -119,18 +121,30 @@ def main():
         'num_epochs': 20  # Increased from 10
     }
     
+    # LSTM-specific hyperparameters (much more conservative to prevent mode collapse)
+    lstm_hyperparams = {
+        'embedding_dim': 128,
+        'hidden_dim': 128,  # Reduced from 256 to prevent overfitting
+        'num_layers': 1,  # Reduced from 2 - simpler model
+        'dropout': 0.5,  # Increased from 0.3 for more regularization
+        'batch_size': 16,  # Smaller batches for more stable gradients
+        'learning_rate': 0.0005,  # Much lower learning rate
+        'num_epochs': 30  # More epochs to compensate
+    }
+    
     models_to_train = [
-        (RNNModel, 'RNN'),
-        (GRUModel, 'GRU'),
-        (LSTMModel, 'LSTM'),
-        (BiLSTMModel, 'BiLSTM')
+        (RNNModel, 'RNN', sequence_hyperparams),
+        (GRUModel, 'GRU', sequence_hyperparams),
+        (LSTMModel, 'LSTM', lstm_hyperparams),  # Use LSTM-specific params
+        (BiLSTMModel, 'BiLSTM', sequence_hyperparams)
     ]
     
-    for model_class, model_name in models_to_train:
-        results, params = train_sequence_model(model_class, model_name, train_dataset, 
-                                              test_dataset, sequence_hyperparams, device, class_weights)
+    for model_class, model_name, hyperparams in models_to_train:
+        results, params, history = train_sequence_model(model_class, model_name, train_dataset, 
+                                              test_dataset, hyperparams, device, class_weights)
         results_dict[model_name] = results
         hyperparams_dict[model_name] = params
+        histories[model_name] = history
     
     transformer_hyperparams = {
         'max_len': 128,
@@ -140,21 +154,23 @@ def main():
         'num_epochs': 5
     }
     
-    results, params = train_transformer_model(
+    results, params, history = train_transformer_model(
         MBERTModel, 'mBERT', BertTokenizer, 'bert-base-multilingual-cased',
         train_texts, train_labels, test_texts, test_labels, 
         transformer_hyperparams, device, class_weights
     )
     results_dict['mBERT'] = results
     hyperparams_dict['mBERT'] = params
+    histories['mBERT'] = history
     
-    results, params = train_transformer_model(
+    results, params, history = train_transformer_model(
         XLMRobertaModel_Custom, 'XLM-RoBERTa', XLMRobertaTokenizer, 'xlm-roberta-base',
         train_texts, train_labels, test_texts, test_labels, 
         transformer_hyperparams, device, class_weights
     )
     results_dict['XLM-RoBERTa'] = results
     hyperparams_dict['XLM-RoBERTa'] = params
+    histories['XLM-RoBERTa'] = history
     
     print("\n" + "="*80)
     print("RESULTS SUMMARY")
@@ -179,7 +195,11 @@ def main():
     hyperparams_df = pd.DataFrame(hyperparams_dict).T
     hyperparams_df.to_csv('results/hyperparameters.csv')
     
-    print("\nResults saved to 'results/' directory")
+    # Plot training metrics
+    model_names = list(histories.keys())
+    plot_training_history(histories, model_names, save_dir='results')
+    
+    print("\nResults and plots saved to 'results/' directory")
 
 if __name__ == "__main__":
     main()
