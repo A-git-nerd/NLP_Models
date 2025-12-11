@@ -16,9 +16,9 @@ from training.trainer import train_model
 from evaluation.metrics import calculate_bleu, translate_sentence
 
 def train_rnn_random_embeddings(train_loader, val_loader, src_vocab_size, tgt_vocab_size, device, hyperparams):
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("Training RNN Seq2Seq with Random Embeddings")
-    print("="*80)
+    print("-"*80)
     
     encoder = RNNEncoder(
         src_vocab_size, 
@@ -51,9 +51,9 @@ def train_rnn_random_embeddings(train_loader, val_loader, src_vocab_size, tgt_vo
 
 def train_rnn_glove_embeddings(train_loader, val_loader, src_vocab_size, tgt_vocab_size, 
                                src_vocab, device, hyperparams):
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("Training RNN Seq2Seq with Pre-trained GloVe Embeddings")
-    print("="*80)
+    print("-"*80)
     
     glove_model = download_glove_embeddings(embedding_dim=hyperparams['embedding_dim'])
     
@@ -89,30 +89,78 @@ def train_rnn_glove_embeddings(train_loader, val_loader, src_vocab_size, tgt_voc
     return model, train_losses, val_losses, epoch_times, total_time
 
 def plot_training_curves(random_train_losses, random_val_losses, 
-                         glove_train_losses, glove_val_losses):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+                         glove_train_losses, glove_val_losses, random_bleu, glove_bleu):
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
     
     epochs = range(1, len(random_train_losses) + 1)
     
-    ax1.plot(epochs, random_train_losses, 'b-', label='Random - Train Loss')
-    ax1.plot(epochs, random_val_losses, 'b--', label='Random - Val Loss')
+    # Random embeddings - Train and Val Loss
+    ax1 = axes[0, 0]
+    ax1.plot(epochs, random_train_losses, 'b-', label='Train Loss', marker='o', markersize=4)
+    ax1.plot(epochs, random_val_losses, 'b--', label='Val Loss', marker='s', markersize=4)
     ax1.set_xlabel('Epoch')
     ax1.set_ylabel('Loss')
     ax1.set_title('RNN with Random Embeddings - Training Curves')
     ax1.legend()
-    ax1.grid(True)
+    ax1.grid(True, alpha=0.3)
     
-    ax2.plot(epochs, glove_train_losses, 'r-', label='GloVe - Train Loss')
-    ax2.plot(epochs, glove_val_losses, 'r--', label='GloVe - Val Loss')
+    # GloVe embeddings - Train and Val Loss
+    ax2 = axes[0, 1]
+    ax2.plot(epochs, glove_train_losses, 'r-', label='Train Loss', marker='o', markersize=4)
+    ax2.plot(epochs, glove_val_losses, 'r--', label='Val Loss', marker='s', markersize=4)
     ax2.set_xlabel('Epoch')
     ax2.set_ylabel('Loss')
     ax2.set_title('RNN with GloVe Embeddings - Training Curves')
     ax2.legend()
-    ax2.grid(True)
+    ax2.grid(True, alpha=0.3)
+    
+    # Train Loss Comparison
+    ax3 = axes[1, 0]
+    ax3.plot(epochs, random_train_losses, 'b-', label='Random', marker='o', markersize=4)
+    ax3.plot(epochs, glove_train_losses, 'r-', label='GloVe', marker='s', markersize=4)
+    ax3.set_xlabel('Epoch')
+    ax3.set_ylabel('Train Loss')
+    ax3.set_title('Training Loss Comparison')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+    
+    # Validation Loss Comparison
+    ax4 = axes[1, 1]
+    ax4.plot(epochs, random_val_losses, 'b--', label='Random', marker='o', markersize=4)
+    ax4.plot(epochs, glove_val_losses, 'r--', label='GloVe', marker='s', markersize=4)
+    ax4.set_xlabel('Epoch')
+    ax4.set_ylabel('Validation Loss')
+    ax4.set_title('Validation Loss Comparison')
+    ax4.legend()
+    ax4.grid(True, alpha=0.3)
     
     plt.tight_layout()
     plt.savefig('results/training_curves.png', dpi=300, bbox_inches='tight')
     print("\nTraining curves saved to 'results/training_curves.png'")
+    plt.close()
+    
+    # Create BLEU score comparison plot
+    fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+    models = ['Random Embeddings', 'GloVe Embeddings']
+    bleu_values = [random_bleu, glove_bleu]
+    colors = ['#3498db', '#e74c3c']
+    bars = ax.bar(models, bleu_values, color=colors, alpha=0.7, edgecolor='black', linewidth=1.5)
+    
+    ax.set_ylabel('BLEU Score', fontsize=12)
+    ax.set_title('BLEU Score Comparison', fontsize=14, fontweight='bold')
+    ax.set_ylim([0, max(bleu_values) * 1.2])
+    ax.grid(True, axis='y', alpha=0.3)
+    
+    # Add value labels on bars
+    for bar, value in zip(bars, bleu_values):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+                f'{value:.2f}',
+                ha='center', va='bottom', fontsize=12, fontweight='bold')
+    
+    plt.tight_layout()
+    plt.savefig('results/bleu_comparison.png', dpi=300, bbox_inches='tight')
+    print("BLEU comparison plot saved to 'results/bleu_comparison.png'")
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -141,7 +189,7 @@ def main():
         'num_layers': 1,
         'dropout': 0.0,
         'learning_rate': 0.001,
-        'num_epochs': 200,
+        'num_epochs': 20,
         'clip': 1,
         'optimizer': 'Adam'
     }
@@ -154,9 +202,9 @@ def main():
         train_loader, val_loader, len(src_vocab), len(tgt_vocab), src_vocab, device, hyperparams
     )
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("EVALUATION - BLEU SCORES")
-    print("="*80)
+    print("-"*80)
     
     test_data = list(zip(test_en, test_ur))
     
@@ -170,9 +218,9 @@ def main():
     )
     print(f"RNN with GloVe Embeddings: BLEU = {glove_bleu:.2f}")
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("TRAINING TIME COMPARISON")
-    print("="*80)
+    print("-"*80)
     
     print(f"Random Embeddings - Total Training Time: {random_total_time:.2f}s ({random_total_time/60:.2f} minutes)")
     print(f"Random Embeddings - Average Time per Epoch: {np.mean(random_epoch_times):.2f}s")
@@ -180,9 +228,9 @@ def main():
     print(f"GloVe Embeddings - Average Time per Epoch: {np.mean(glove_epoch_times):.2f}s")
     print(f"\nTime Difference: {abs(random_total_time - glove_total_time):.2f}s")
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("INFERENCE EXAMPLES")
-    print("="*80)
+    print("-"*80)
     
     test_sentences = test_en[:5]
     
@@ -197,9 +245,9 @@ def main():
         glove_translation = translate_sentence(glove_model, sentence, src_vocab, tgt_vocab, device)
         print(f"GloVe Embeddings: {glove_translation}")
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("PERFORMANCE ANALYSIS")
-    print("="*80)
+    print("-"*80)
     
     bleu_improvement = glove_bleu - random_bleu
     bleu_improvement_pct = (bleu_improvement / random_bleu * 100) if random_bleu > 0 else 0
@@ -215,9 +263,9 @@ def main():
     print(f"Final Validation Loss - GloVe: {final_glove_loss:.4f}")
     print(f"Loss Improvement: {loss_improvement:.4f} ({loss_improvement_pct:+.2f}%)")
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("DISCUSSION")
-    print("="*80)
+    print("-"*80)
     
     discussion = f"""
 Impact of Pre-trained GloVe Embeddings:
@@ -283,9 +331,9 @@ Impact of Pre-trained GloVe Embeddings:
         f.write(discussion)
     
     plot_training_curves(random_train_losses, random_val_losses, 
-                        glove_train_losses, glove_val_losses)
+                        glove_train_losses, glove_val_losses, random_bleu, glove_bleu)
     
-    print("\nAll results saved to 'results/' directory")
+    print("\nAll results and plots saved to 'results/' directory")
 
 if __name__ == "__main__":
     main()

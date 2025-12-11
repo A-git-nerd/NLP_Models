@@ -1,30 +1,30 @@
 Example 1:
-Source (English): return next week
-Reference (Urdu): اگلے ہفتے واپس آؤ
-Random Embeddings: وہ ایک ڈاکٹر ہے
-GloVe Embeddings: وہ ایک استاد ہے
+Source (English): dont cry
+Reference (Urdu): کیا اس کے پاس کتا ہے؟
+Random Embeddings: میں نے ایک کو دیکھا
+GloVe Embeddings: میں نے ایک گھڑی کھو دی۔
 
 Example 2:
-Source (English): i eat rice
-Reference (Urdu): میں چاول کھاتا ہوں
-Random Embeddings: وہ ایک ڈاکٹر ہے
-GloVe Embeddings: وہ ایک استاد ہے
+Source (English): does he have a dog
+Reference (Urdu): تم مجھ سے نفرت کیوں کرتے ہو
+Random Embeddings: میں نے ایک کو دیکھا
+GloVe Embeddings: میں نے ایک گھڑی کھو دی۔
 
 Example 3:
-Source (English): he drinks milk
-Reference (Urdu): وہ دودھ پیتا ہے
-Random Embeddings: وہ ایک ڈاکٹر ہے
-GloVe Embeddings: وہ ایک استاد ہے
+Source (English): why do you hate me
+Reference (Urdu): اپنی کھڑکی سے باہر دیکھو
+Random Embeddings: میں نے ایک کو دیکھا
+GloVe Embeddings: میں نے ایک گھڑی کھو دی۔
 
 Example 4:
-Source (English): she cooks food
-Reference (Urdu): وہ کھانا پکاتی ہے
-Random Embeddings: وہ ایک ڈاکٹر ہے
-GloVe Embeddings: وہ ایک استاد ہے
+Source (English): look out your window
+Reference (Urdu): کیا آپ کو چابیاں چاہیے؟
+Random Embeddings: میں نے ایک کو دیکھا
+GloVe Embeddings: میں نے ایک گھڑی کھو دی۔
 
 Example 5:
-Source (English): we play cricket
-Reference (Urdu): ہم کرکٹ کھیلتے ہیں
-Random Embeddings: وہ ایک ڈاکٹر ہے
-GloVe Embeddings: وہ ایک استاد ہے
+Source (English): do you need the keys
+Reference (Urdu): کیا آپ ٹام کے ساتھ جائیں گے؟
+Random Embeddings: میں نے ایک کو دیکھا
+GloVe Embeddings: میں نے ایک گھڑی کھو دی۔
 

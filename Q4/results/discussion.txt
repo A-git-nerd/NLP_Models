@@ -1,18 +1,19 @@
+
 Impact of Pre-trained GloVe Embeddings:
 
 1. BLEU Score Performance:
-   - Random Embeddings: 19.00
-   - GloVe Embeddings: 19.00
-   - Improvement: +0.00 (+0.00%)
+   - Random Embeddings: 50.00
+   - GloVe Embeddings: 42.73
+   - Improvement: -7.27 (-14.54%)
 
 2. Training Time:
-   - Random Embeddings: 60.25s
-   - GloVe Embeddings: 53.89s
-   - Difference: 6.36s
+   - Random Embeddings: 1287.71s
+   - GloVe Embeddings: 1871.35s
+   - Difference: 583.64s
 
 3. Convergence Speed:
-   - Random final val loss: 5.3897
-   - GloVe final val loss: 5.4745
+   - Random final val loss: 6.5772
+   - GloVe final val loss: 7.0987
 
 4. Key Observations:
    - Pre-trained embeddings provide better semantic initialization
