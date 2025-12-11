@@ -74,11 +74,19 @@ def train_model(model, train_iterator, val_iterator, optimizer, criterion, n_epo
     best_valid_loss = float('inf')
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10)
     
+    history = {
+        'train_loss': [],
+        'val_loss': []
+    }
+    
     for epoch in range(n_epochs):
         train_loss = train_seq2seq(model, train_iterator, optimizer, criterion, clip, device, is_transformer)
         valid_loss = evaluate_seq2seq(model, val_iterator, criterion, device, is_transformer)
         
         scheduler.step(valid_loss)
+        
+        history['train_loss'].append(train_loss)
+        history['val_loss'].append(valid_loss)
         
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
@@ -86,4 +94,4 @@ def train_model(model, train_iterator, val_iterator, optimizer, criterion, n_epo
         if (epoch + 1) % 50 == 0 or epoch == 0:
             print(f'Epoch: {epoch+1:03} | Train Loss: {train_loss:.3f} | Val Loss: {valid_loss:.3f} | Best Val: {best_valid_loss:.3f}')
     
-    return model
+    return model, history

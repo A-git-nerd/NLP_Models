@@ -15,11 +15,12 @@ from models.transformer_seq2seq import TransformerSeq2Seq
 from models.mbart_seq2seq import MBARTSeq2Seq
 from training.trainer import train_model
 from evaluation.metrics import calculate_bleu, translate_sentence
+from utils.plotting import plot_training_history
 
 def train_rnn_model(train_loader, val_loader, src_vocab_size, tgt_vocab_size, device, hyperparams):
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("Training RNN Seq2Seq Model")
-    print("="*80)
+    print("-"*80)
     
     encoder = RNNEncoder(
         src_vocab_size, 
@@ -41,17 +42,17 @@ def train_rnn_model(train_loader, val_loader, src_vocab_size, tgt_vocab_size, de
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams['learning_rate'])
     criterion = nn.CrossEntropyLoss(ignore_index=0)
     
-    model = train_model(
+    model, history = train_model(
         model, train_loader, val_loader, optimizer, criterion, 
         hyperparams['num_epochs'], hyperparams['clip'], device, is_transformer=False
     )
     
-    return model
+    return model, history
 
 def train_birnn_model(train_loader, val_loader, src_vocab_size, tgt_vocab_size, device, hyperparams):
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("Training BiRNN Seq2Seq Model")
-    print("="*80)
+    print("-"*80)
     
     encoder = BiRNNEncoder(
         src_vocab_size, 
@@ -73,17 +74,17 @@ def train_birnn_model(train_loader, val_loader, src_vocab_size, tgt_vocab_size, 
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams['learning_rate'])
     criterion = nn.CrossEntropyLoss(ignore_index=0)
     
-    model = train_model(
+    model, history = train_model(
         model, train_loader, val_loader, optimizer, criterion, 
         hyperparams['num_epochs'], hyperparams['clip'], device, is_transformer=False
     )
     
-    return model
+    return model, history
 
 def train_lstm_model(train_loader, val_loader, src_vocab_size, tgt_vocab_size, device, hyperparams):
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("Training LSTM Seq2Seq Model")
-    print("="*80)
+    print("-"*80)
     
     encoder = LSTMEncoder(
         src_vocab_size, 
@@ -105,17 +106,17 @@ def train_lstm_model(train_loader, val_loader, src_vocab_size, tgt_vocab_size, d
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams['learning_rate'])
     criterion = nn.CrossEntropyLoss(ignore_index=0)
     
-    model = train_model(
+    model, history = train_model(
         model, train_loader, val_loader, optimizer, criterion, 
         hyperparams['num_epochs'], hyperparams['clip'], device, is_transformer=False
     )
     
-    return model
+    return model, history
 
 def train_transformer_model(train_loader, val_loader, src_vocab_size, tgt_vocab_size, device, hyperparams):
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("Training Transformer Model")
-    print("="*80)
+    print("-"*80)
     
     model = TransformerSeq2Seq(
         src_vocab_size,
@@ -132,17 +133,17 @@ def train_transformer_model(train_loader, val_loader, src_vocab_size, tgt_vocab_
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams['learning_rate'])
     criterion = nn.CrossEntropyLoss(ignore_index=0)
     
-    model = train_model(
+    model, history = train_model(
         model, train_loader, val_loader, optimizer, criterion, 
         hyperparams['num_epochs'], hyperparams['clip'], device, is_transformer=True
     )
     
-    return model
+    return model, history
 
 def use_mbart_model(test_en, test_ur, device):
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("Using Pre-trained mBART-50 Model (Zero-shot)")
-    print("="*80)
+    print("-"*80)
     
     model = MBARTSeq2Seq(device=device)
     model.to(device)
@@ -178,7 +179,7 @@ def main():
         'num_layers': 1,
         'dropout': 0.1,
         'learning_rate': 0.01,
-        'num_epochs': 50,
+        'num_epochs': 10,
         'clip': 1,
         'optimizer': 'Adam'
     }
@@ -191,38 +192,43 @@ def main():
         'dim_feedforward': 256,
         'dropout': 0.1,
         'learning_rate': 0.001,
-        'num_epochs': 50,
+        'num_epochs': 20,
         'clip': 1,
         'optimizer': 'Adam'
     }
     
     models = {}
     hyperparams_dict = {}
+    histories = {}
     
-    rnn_model = train_rnn_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, rnn_hyperparams)
+    rnn_model, rnn_history = train_rnn_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, rnn_hyperparams)
     models['RNN Seq2Seq'] = rnn_model
     hyperparams_dict['RNN Seq2Seq'] = rnn_hyperparams
+    histories['RNN Seq2Seq'] = rnn_history
     
-    birnn_model = train_birnn_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, rnn_hyperparams)
+    birnn_model, birnn_history = train_birnn_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, rnn_hyperparams)
     models['BiRNN Seq2Seq'] = birnn_model
     hyperparams_dict['BiRNN Seq2Seq'] = rnn_hyperparams
+    histories['BiRNN Seq2Seq'] = birnn_history
     
-    lstm_model = train_lstm_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, rnn_hyperparams)
+    lstm_model, lstm_history = train_lstm_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, rnn_hyperparams)
     models['LSTM Seq2Seq'] = lstm_model
     hyperparams_dict['LSTM Seq2Seq'] = rnn_hyperparams
+    histories['LSTM Seq2Seq'] = lstm_history
     
-    transformer_model = train_transformer_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, transformer_hyperparams)
+    transformer_model, transformer_history = train_transformer_model(train_loader, val_loader, len(src_vocab), len(tgt_vocab), device, transformer_hyperparams)
     models['Transformer'] = transformer_model
     hyperparams_dict['Transformer'] = transformer_hyperparams
+    histories['Transformer'] = transformer_history
     
     # Add pre-trained mBART (zero-shot)
     mbart_model = use_mbart_model(test_en, test_ur, device)
     models['mBART-50 (zero-shot)'] = mbart_model
     hyperparams_dict['mBART-50 (zero-shot)'] = {'model': 'facebook/mbart-large-50', 'fine_tuning': 'none'}
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("EVALUATION - BLEU SCORES")
-    print("="*80)
+    print("-"*80)
     
     results = {}
     test_data = list(zip(test_en, test_ur))
@@ -256,9 +262,9 @@ def main():
             }
         print(f"{model_name}: BLEU = {bleu_score:.2f}")
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("INFERENCE EXAMPLES")
-    print("="*80)
+    print("-"*80)
     
     test_sentences = test_en[:5]
     
@@ -273,9 +279,9 @@ def main():
             translation = translate_sentence(model, sentence, src_vocab, tgt_vocab, device, is_transformer=is_transformer)
             print(f"  {model_name}: {translation}")
     
-    print("\n" + "="*80)
+    print("\n" + "-"*80)
     print("HYPERPARAMETERS")
-    print("="*80)
+    print("-"*80)
     
     for model_name, params in hyperparams_dict.items():
         print(f"\n{model_name}:")
@@ -291,6 +297,10 @@ def main():
     hyperparams_df = pd.DataFrame(hyperparams_dict).T
     hyperparams_df.to_csv('results/hyperparameters.csv')
     
+    # Create plots
+    bleu_scores_dict = {name: res['BLEU Score'] for name, res in results.items()}
+    plot_training_history(histories, bleu_scores_dict, list(histories.keys()), save_dir='results')
+    
     with open('results/inference_examples.txt', 'w', encoding='utf-8') as f:
         for i, sentence in enumerate(test_sentences):
             f.write(f"Example {i+1}:\n")
@@ -303,7 +313,7 @@ def main():
                 f.write(f"  {model_name}: {translation}\n")
             f.write("\n")
     
-    print("\nResults saved to 'results/' directory")
+    print("\nResults and plots saved to 'results/' directory")
 
 if __name__ == "__main__":
     main()

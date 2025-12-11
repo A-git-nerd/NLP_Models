@@ -1,50 +1,50 @@
 Example 1:
-Source (English): return next week
-Reference (Urdu): اگلے ہفتے واپس آؤ
+Source (English): dont cry
+Reference (Urdu): کیا اس کے پاس کتا ہے؟
 Translations:
-  RNN Seq2Seq: وہ ایک ہے
-  BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
-  Transformer: میں تیر سکتا ہوں
-  mBART-50 (zero-shot): واپس اگلے ہفتے
+  RNN Seq2Seq: مجھے لگتا ہے
+  BiRNN Seq2Seq: زین نے ڈرنک کا فون کیا
+  LSTM Seq2Seq: میں حملے کی قیادت کی کوشش کی
+  Transformer: میں نے ایک سیب کھایا
+  mBART-50 (zero-shot): نہ رو
 
 Example 2:
-Source (English): i eat rice
-Reference (Urdu): میں چاول کھاتا ہوں
+Source (English): does he have a dog
+Reference (Urdu): تم مجھ سے نفرت کیوں کرتے ہو
 Translations:
-  RNN Seq2Seq: وہ ایک گاڑی ہے
-  BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
-  Transformer: میں ٹھیک ہوں
-  mBART-50 (zero-shot): میں روٹی کھاتا ہوں.
+  RNN Seq2Seq: مجھے لگتا ہے
+  BiRNN Seq2Seq: گرنے نے ڈرنک کا فون کیا
+  LSTM Seq2Seq: وہ اس کی ضرورت ہے
+  Transformer: میں نے ایک سیب کھایا
+  mBART-50 (zero-shot): وہ ایک کتا ہے؟
 
 Example 3:
-Source (English): he drinks milk
-Reference (Urdu): وہ دودھ پیتا ہے
+Source (English): why do you hate me
+Reference (Urdu): اپنی کھڑکی سے باہر دیکھو
 Translations:
-  RNN Seq2Seq: وہ ایک ہے
-  BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
-  Transformer: وہ کل گیا تھا
-  mBART-50 (zero-shot): وہ دودھ پیتا ہے
+  RNN Seq2Seq: مجھے لگتا ہے
+  BiRNN Seq2Seq: گرنے نے ڈرنک کا فون کیا
+  LSTM Seq2Seq: میں بیمہ ہے۔
+  Transformer: میں نے ایک سیب کھایا
+  mBART-50 (zero-shot): کیوں تم مجھ سے نفرت کرتے ہیں
 
 Example 4:
-Source (English): she cooks food
-Reference (Urdu): وہ کھانا پکاتی ہے
+Source (English): look out your window
+Reference (Urdu): کیا آپ کو چابیاں چاہیے؟
 Translations:
-  RNN Seq2Seq: وہ ایک گاڑی ہے
-  BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
-  Transformer: وہ کل گیا تھا
-  mBART-50 (zero-shot): وہ کھانا پکتا ہے
+  RNN Seq2Seq: مجھے لگتا ہے
+  BiRNN Seq2Seq: گرنے نے ڈرنک
+  LSTM Seq2Seq: میں نہیں ہے
+  Transformer: میں نے ایک سیب کھایا
+  mBART-50 (zero-shot): آپ کی ونڈو باہر دیکھو
 
 Example 5:
-Source (English): we play cricket
-Reference (Urdu): ہم کرکٹ کھیلتے ہیں
+Source (English): do you need the keys
+Reference (Urdu): کیا آپ ٹام کے ساتھ جائیں گے؟
 Translations:
-  RNN Seq2Seq: وہ ایک گاڑی ہے
-  BiRNN Seq2Seq: وہ ایک گاڑی ہے
-  LSTM Seq2Seq: میں یونیورسٹی میں پڑھتا ہوں
-  Transformer: ہم ناچ سکتے ہیں
-  mBART-50 (zero-shot): ہم کرکیٹ کھیلتے ہیں
+  RNN Seq2Seq: مجھے لگتا ہے
+  BiRNN Seq2Seq: گرنے نے ڈرنک کا فون کیا
+  LSTM Seq2Seq: زین کی معلومات کا مرکز ہیں، ہوتی ہے۔
+  Transformer: میں نے ایک سیب کھایا
+  mBART-50 (zero-shot): آپ کو چابیاں ضرورت ہے؟
 
